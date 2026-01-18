@@ -610,6 +610,146 @@ aire build --force-remote
 - **Debugger**: BEAM debugger integration
 - **Type Hints**: Inline type display in editors
 
+### 10.5 Documentation System (Rustdoc-style)
+
+Documentation lives **alongside source code**, compiled to HTML like Rust's `cargo doc`.
+
+```aire
+# Calculates the factorial of a number
+# 
+# # Examples
+# 
+# ```
+# factorial(5) # => 120
+# ```
+#
+# - Parameter n: The number to calculate factorial for
+# - Returns: The factorial result or nil if n is negative
+#
+fn factorial(n: Int) -> Int?
+  if n < 0 then
+    nil
+  elif n == 0 or n == 1 then
+    1
+  else
+    n * factorial(n - 1)
+  end
+end
+```
+
+**Documentation features:**
+- `///` for single-line docs
+- `/** ... */` for multi-line docs
+- Markdown support in docs
+- Code examples with ` ```aire ... ``` `
+- Automatic cross-references (`[`module`]` links to other modules)
+- Doc tests (examples run as tests)
+
+**Commands:**
+
+```bash
+aire doc              # Generate HTML docs
+aire doc --open       # Generate and open in browser
+aire doc --test       # Run doc tests
+```
+
+**Output:** Static HTML in `target/doc/` (like Rust)
+
+### 10.6 Inline Tests
+
+Tests live **in the same file** as source code, unless they significantly impact compilation time.
+
+```aire
+agent Counter
+  count: Int = 0
+do
+  pub fn increment()
+    count += 1
+  end
+  
+  pub fn get() -> Int
+    count
+  end
+end
+
+# Tests for Counter - run with `aire test`
+test "counter starts at zero"
+  let counter = Counter()
+  assert counter.get() == 0
+end
+
+test "increment increases count"
+  let counter = Counter()
+  counter.increment()
+  counter.increment()
+  assert counter.get() == 2
+end
+
+# Doc tests in examples
+# /// ```
+# /// let c = Counter()
+# /// c.increment()
+# /// assert c.get() == 1
+# /// ```
+```
+
+**Test organization:**
+- `test "description"` - single assertion or block
+- `assert` and `assert_eq` macros
+- `test module "description"` - grouped tests
+- `ignore` flag for disabled tests
+- `test ["tag1", "tag2"]` - tag-based filtering
+
+**Commands:**
+
+```bash
+aire test              # Run all tests
+aire test module       # Run tests for specific module
+aire test --doc        # Run only doc tests
+aire test --unit       # Run only unit tests
+aire test --watch      # Watch mode (Elixir-style)
+```
+
+### 10.7 Interactive REPL (Elixir-style)
+
+Elixir-inspired REPL with rich output and history.
+
+```bash
+$ aire REPL
+Aire v0.1.0 - Interactive REPL
+Type :help for available commands
+
+iex(1)> let greeter = Greeter(name: "World")
+#Function<greeter>
+
+iex(2)> greeter.greet()
+"Hello, World! (greeted 1 times)"
+
+iex(3)> :erlang.now()
+{1234, 567890, 123456}
+
+iex(4)> help()
+# Shows available commands and shortcuts
+
+iex(5)> c "my_module.aire"    # Compile and load file
+iex(6)> r Greeter             # Reload module
+iex(7)> pid(0,123,0) <- :ping # Send message to process
+```
+
+**REPL features:**
+- Multi-line expressions (automatic detection)
+- History with arrow keys
+- Auto-complete (Tab)
+- Rich output formatting (color, structure)
+- `:command` syntax for REPL commands
+- Break out to shell with `Ctrl+C`
+- Persisted history (`~/.aire_repl_history`)
+
+**Integration:**
+- Can load compiled modules
+- Can define functions in REPL
+- Hot code reloading during development
+
 ---
 
 ## 11. Competitive Analysis
@@ -658,6 +798,9 @@ No existing language offers this specific combination.
 - [ ] Incremental compilation (local)
 - [ ] Basic CLI tool
 - [ ] Simple formatter
+- [ ] **Inline tests** (same file as source)
+- [ ] **Doc comments** (`///` and `/** */`)
+- [ ] **REPL** (Elixir-style, basic)
 
 ### 12.2 Should Have (v0.2)
 
@@ -668,6 +811,9 @@ No existing language offers this specific combination.
 - [ ] Package manager (basic)
 - [ ] Typed channels
 - [ ] Error handling with `Result`
+- [ ] **Doc tests** (run examples in docs)
+- [ ] **HTML documentation generator** (rustdoc-style)
+- [ ] **REPL** (with auto-complete, history)
 
 ### 12.3 Could Have (v0.3+)
 
